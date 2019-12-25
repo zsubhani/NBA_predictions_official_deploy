@@ -1,4 +1,4 @@
-# Python script to generate NBA game predictions for 2018-2019 season
+# Python script to generate NBA game predictions for 2019-2020 season
 ########################################################################## 
 
 # Dependencies
@@ -126,7 +126,8 @@ while x == 0:
     try:
         for team in teams:
             # URL
-            url = r"https://www.basketball-reference.com/teams/" + team + "/2019.html"
+            #url = r"https://www.basketball-reference.com/teams/" + team + "/2019.html"
+            url = r"https://www.basketball-reference.com/teams/" + team + "/2020.html"
             browser.visit(url)
 
             # add some delay
@@ -181,7 +182,9 @@ stats_df
 # -------------------------------------------------------------------------------------
 
 # setup database connection
-stats_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+
+#stats_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+stats_engine = create_engine('sqlite:///db/nba_schedule_abr.sqlite')
 # send stats dataframe to stats table in database file
 stats_df.to_sql('stats', stats_engine, if_exists='replace', index=False)
 
@@ -193,7 +196,9 @@ stats_sql_df.head()
 
 import sqlite3
 #connect to the database
-conn = sqlite3.connect('db/schedule_abr.sqlite')
+
+#conn = sqlite3.connect('db/schedule_abr.sqlite')
+conn = sqlite3.connect('db/nba_schedule_abr.sqlite')
 c = conn.cursor()
 
 c.executescript('''
@@ -225,9 +230,13 @@ conn.close()
 # -------------------------------------------------------------------------------------
 
 # setup database connection
-schedule_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+
+#schedule_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+schedule_engine = create_engine('sqlite:///db/nba_schedule_abr.sqlite')
 # test that we can query from nba_2018_2019_schedule_logo table in database file
-schedule_sql_df = pd.read_sql_query('SELECT * FROM nba_2018_2019_schedule_logo',schedule_engine)
+#schedule_sql_df = pd.read_sql_query('SELECT * FROM nba_2018_2019_schedule_logo',schedule_engine)
+# test that we can query from nba_2020_schedule_logo table in database file
+schedule_sql_df = pd.read_sql_query('SELECT * FROM nba_2020_schedule_logo',schedule_engine)
 schedule_sql_df.head()
 
 # function to get today's date in same format as 'date' column of nba_2018_2019_schedule_logo table in database
@@ -261,7 +270,10 @@ schedule_date
 # this queries database
 
 def get_todays_games(sch_date):
-    cmd1 = 'SELECT * FROM nba_2018_2019_schedule_logo WHERE date='
+    # for 2018-2019 season use nba_2018_2019_schedule_logo
+    #cmd1 = 'SELECT * FROM nba_2018_2019_schedule_logo WHERE date='
+    # for 2019-2020 season use nba_2020_schedule_logo
+    cmd1 = 'SELECT * FROM nba_2020_schedule_logo WHERE date='
     print(cmd1)
     cmd2 = "'"
     print(cmd2)
@@ -342,7 +354,9 @@ prediction_iterrow(todays_games_df, todays_stats_df)
 todays_games_df
 
 # update SQL database in a table called 'today_predictions' with our predictions for today's games
-schedule_abr_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+
+#schedule_abr_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+schedule_abr_engine = create_engine('sqlite:///db/nba_schedule_abr.sqlite')
 todays_games_df.to_sql('today_predictions', schedule_abr_engine, if_exists='replace', index=False)
 
 # test that we can query from today_predictions table in db
@@ -353,7 +367,9 @@ today_predictions_sql_df.head()
 
 import sqlite3
 #connect to the database
-conn = sqlite3.connect('db/schedule_abr.sqlite')
+
+#conn = sqlite3.connect('db/schedule_abr.sqlite')
+conn = sqlite3.connect('db/nba_schedule_abr.sqlite')
 c = conn.cursor()
 
 c.executescript('''
@@ -398,12 +414,19 @@ current_stats_df.head()
 # this queries database
 
 def get_year_games(year):
-    cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2018_2019_schedule_logo WHERE substr(date, 5, 4)='
+    #cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2018_2019_schedule_logo WHERE substr(date, 5, 4)='
+    # cmd1 for end of 2019 games (months 10, 11, 12)
+    #cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2019_2020_schedule_logo WHERE substr(date, 6, 4)='
+    # cmd1 for 2020 games (months 1, 2, 3, 4)
+    cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2019_2020_schedule_logo WHERE substr(date, 5, 4)='
     print(cmd1)
     cmd2 = "'"
     print(cmd2)
     cmd3 = "'"
     print(cmd3)
+    #cmd4 for 2019 games (months 10, 11, 12)
+    # cmd4 = 'or substr(date, 7, 4)='
+    #cmd4 for 2020 games (months 1, 2, 3, 4)
     cmd4 = 'or substr(date, 6, 4)='
     print(cmd4)
     cmd5 = "'"
@@ -416,7 +439,9 @@ def get_year_games(year):
     return schedule_year_df
 
 # get 2019's games into a dataframe
-season_year = '2019'
+#season_year = '2019'
+# use 2020 games starting in January into a dataframe
+season_year = '2020'
 year_games_df = get_year_games(season_year)
 year_games_df.head()
 
@@ -424,7 +449,9 @@ year_games_df.head()
 prediction_iterrow(year_games_df, current_stats_df)
 
 # update SQL database in a table called 'year_predictions' with our predictions for the rest of season (year) games
-year_schedule_abr_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+
+#year_schedule_abr_engine = create_engine('sqlite:///db/schedule_abr.sqlite')
+year_schedule_abr_engine = create_engine('sqlite:///db/nba_schedule_abr.sqlite')
 year_games_df.to_sql('year_predictions', year_schedule_abr_engine, if_exists='replace', chunksize=75, index=False)
 
 # test that we can query from year_predictions table in db
@@ -435,7 +462,9 @@ year_predictions_sql_df.head()
 
 import sqlite3
 #connect to the database
-conn = sqlite3.connect('db/schedule_abr.sqlite')
+
+#conn = sqlite3.connect('db/schedule_abr.sqlite')
+conn = sqlite3.connect('db/nba_schedule_abr.sqlite')
 c = conn.cursor()
 
 c.executescript('''
