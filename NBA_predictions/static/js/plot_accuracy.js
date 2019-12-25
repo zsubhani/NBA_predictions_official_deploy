@@ -12,7 +12,7 @@ var accuracy_trace = {
 var accuracy_data = [accuracy_trace];
 
 var accuracy_layout = {
-  title: 'NBA 2019 Games Model Prediction Accuracy',
+  title: 'NBA 2020 Games Model Prediction Accuracy',
 };
 
 // Plot chart
