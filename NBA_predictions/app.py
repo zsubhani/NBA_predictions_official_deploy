@@ -25,7 +25,8 @@ app = Flask(__name__)
 #engine = create_engine('sqlite:///db/schedule_abr.sqlite', connect_args={'check_same_thread': False}, echo=False)
 
 app.config['SQLALCHEMY_DATABASE_URI'] =  False
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/schedule_abr.sqlite?check_same_thread=False"
+#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/schedule_abr.sqlite?check_same_thread=False"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/nba_schedule_abr.sqlite?check_same_thread=False"
 db = SQLAlchemy(app)
 
 # reflect an existing database into a new model
@@ -34,7 +35,9 @@ Base = automap_base()
 Base.prepare(db.engine, reflect=True)
 
 # Save reference to the tables
-Schedule = Base.classes.nba_2018_2019_schedule_logo
+
+#Schedule = Base.classes.nba_2018_2019_schedule_logo
+Schedule = Base.classes.nba_2020_schedule_logo
 TodayPredictions = Base.classes.today_predictions
 Stats = Base.classes.stats
 YearPredictions = Base.classes.year_predictions
@@ -185,7 +188,8 @@ def y_predictions():
 @app.route("/model_accuracy")
 def model_accuracy():
     """Return the model_accuracy page."""
-    predict_results_url="https://raw.githubusercontent.com/zsubhani/utexas_hw_python/master/model_predictions_results.csv"
+    #predict_results_url="https://raw.githubusercontent.com/zsubhani/utexas_hw_python/master/model_predictions_results.csv"
+    predict_results_url="https://raw.githubusercontent.com/zsubhani/utexas_hw_python/master/model_predictions_results_2019_2020.csv"
     predict_results_df=pd.read_csv(predict_results_url)
     # calculate number of correct predictions, have to convert to normal int
     predict_num_correct = int(predict_results_df['road_win_prediction_correct'].sum())
