@@ -418,7 +418,7 @@ def get_year_games(year):
     # cmd1 for end of 2019 games (months 10, 11, 12)
     #cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2019_2020_schedule_logo WHERE substr(date, 6, 4)='
     # cmd1 for 2020 games (months 1, 2, 3, 4)
-    cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2019_2020_schedule_logo WHERE substr(date, 5, 4)='
+    cmd1 = 'SELECT game_id, date, home_team, road_team, home_team_abr, road_team_abr, road_win_prediction, home_team_logo, road_team_logo FROM nba_2020_schedule_logo WHERE substr(date, 5, 4)='
     print(cmd1)
     cmd2 = "'"
     print(cmd2)
